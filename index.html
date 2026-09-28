@@ -258,6 +258,8 @@ body {
     border-radius: 5px;
 
     z-index: 4;
+
+    will-change: transform;
 }
 
 .manecilla-hora {
@@ -423,6 +425,8 @@ body {
 
     animation:
         moverFlecha 1.2s ease-in-out infinite;
+
+    will-change: transform;
 }
 
 @keyframes moverFlecha {
@@ -755,11 +759,20 @@ body {
     width: 285px;
     height: 365px;
 
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
 
     z-index: 2;
 
     pointer-events: none;
+
+    /*
+       Optimización:
+       mantiene el fuego en una capa
+       independiente para reducir
+       repintados en celulares.
+    */
+    will-change: transform;
+    isolation: isolate;
 
     filter:
         drop-shadow(0 0 10px rgba(255, 40, 0, 1))
@@ -777,7 +790,44 @@ body {
     filter:
         brightness(1.15)
         saturate(1.2);
+
+    /*
+       Ayuda al navegador a tratar
+       el SVG como una capa separada.
+    */
+    transform: translateZ(0);
+    will-change: transform;
 }
+
+
+/* =========================
+   OPTIMIZACIÓN DE LLAMAS
+========================= */
+
+.llama-roja,
+.llama-naranja,
+.llama-amarilla,
+.llama-izquierda,
+.llama-derecha {
+    /*
+       El navegador prepara estas
+       capas para sus transformaciones.
+    */
+    will-change: transform;
+
+    /*
+       Mantiene las transformaciones
+       dentro de la caja de cada path.
+    */
+    transform-box: fill-box;
+
+    /*
+       Evita cálculos innecesarios
+       relacionados con el renderizado 3D.
+    */
+    backface-visibility: hidden;
+}
+
 
 .llama-roja {
     transform-origin: center bottom;
@@ -967,6 +1017,12 @@ body {
     pointer-events: none;
 
     z-index: 15;
+
+    /*
+       Optimización para las
+       partículas que se mueven.
+    */
+    will-change: transform, opacity;
 
     animation:
         subirParticula linear forwards;
